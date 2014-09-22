@@ -8,7 +8,7 @@ if __name__ == '__main__':
     users.get_or_create(name='admin',
                         password='admin',
                         email='admin@kvoter.local',
-                        roles=['admin'])
+                        user_roles=['admin'])
 
     app.config["SECRET_KEY"] = ("I AM THE DEVELOPMENT SECRET KEY!"
                                 "DO NOT COMMIT ME TO PRODUCTION")
