@@ -1,7 +1,8 @@
+from app import app
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.security import (RoleMixin, Security, SQLAlchemyUserDatastore,
                                 UserMixin)
-from app import app
+import hashlib
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///kvoter.db"
 
@@ -24,11 +25,25 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
     email = db.Column(db.String(255), unique=True)
-    password = db.Column(db.String(255))
+    _password = db.Column(db.String(255))
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime())
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
+
+    @property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, value):
+        salt = hashlib.md5(bytes(self.name, 'utf8')).digest()
+        self._password = hashlib.pbkdf2_hmac(
+            hash_name='sha256',
+            password=bytes(value, 'utf8'),
+            salt=salt,
+            iterations=100000,
+        )
 
 
 user_datastore = SQLAlchemyUserDatastore(db, User, Role)

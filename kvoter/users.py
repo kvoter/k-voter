@@ -1,11 +1,6 @@
-from app import app
 from db import db, user_datastore, User
-import hashlib
 from sqlalchemy.orm.exc import NoResultFound
 import roles
-
-app.config['SECURITY_PASSWORD_HASH'] = 'bcrypt'
-app.config['SECURITY_FLASH_MESSAGES'] = True
 
 
 def create_user(user_name,

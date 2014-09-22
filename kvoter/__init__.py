@@ -9,6 +9,7 @@ import users
 def home_page():
     return render_template("home.html")
 
+
 @app.route("/admin")
 @login_required
 def admin_page():
