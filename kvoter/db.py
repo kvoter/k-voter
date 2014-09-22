@@ -12,13 +12,15 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///kvoter.db"
 db = SQLAlchemy(app)
 
 roles_users = db.Table(
-    'roles_users',
-    db.Column('user_id', db.Integer(), db.ForeignKey('user.id')),
-    db.Column('role_id', db.Integer(), db.ForeignKey('role.id'))
+    'user_roles',
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('roles.id'))
 )
 
 
 class Role(db.Model):
+    __tablename__ = "roles"
+
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))
@@ -30,12 +32,18 @@ class Role(db.Model):
     @staticmethod
     def get_or_create(name, description=""):
         try:
-            return Role.query.filter(Role.name == name).one()
+            role = Role.query.filter(Role.name == name).one()
+            return role
         except NoResultFound:
-            return Role(name, description)
+            role = Role(name, description)
+            db.session.add(role)
+            db.session.commit()
+            return role
 
 
 class User(db.Model, UserMixin):
+    __tablename__ = "users"
+
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
     email = db.Column(db.String(255), unique=True)
@@ -56,7 +64,8 @@ class User(db.Model, UserMixin):
         self.created_on = datetime.now()
         self.confirmation_code = "".join(choice(ascii_letters + digits) for _ in range(32))
         for role in roles:
-            self.roles += Role.get_or_create(role)
+            role_obj = Role.get_or_create(role)
+            self.roles.append(role_obj)
 
     @property
     def password(self):
