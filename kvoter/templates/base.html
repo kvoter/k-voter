@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>K-Voter- Meta-voting</title>
+    <link href="{{ url_for('static', filename='css/bootstrap-3.2.0/css/bootstrap.css') }}" rel="stylesheet">
+    <style>.content {padding-top: 80px;}</style>
+  </head>
+
+  <body>
+
+    {%- block topbar -%}
+    <div class="topbar">
+      <div class="fill">
+        <div class="container">
+          <h2>
+              <a href="/" class="brand">K-Voter</a> <small>Crowdsourcing democracy- welcome to meta-democracy</small>
+          </h2>
+        </div>
+      </div>
+    </div>
+    {%- endblock -%}
+
+    <div class="container">
+      <div class="content">
+        {% block page_header %}{% endblock %}
+        {% block content %}{% endblock %}
+      </div>
+    </div>
+    {% block js_footer %}{% endblock %}
+  </body>
+</html>
