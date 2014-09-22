@@ -1,6 +1,7 @@
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.security import Security, SQLAlchemyUserDatastore, UserMixin, RoleMixin, login_required
+from flask.ext.security import (Security, SQLAlchemyUserDatastore, UserMixin,
+                                RoleMixin, login_required)
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:/"
@@ -38,9 +39,11 @@ if __name__ == '__main__':
     @app.before_first_request
     def create_user():
         db.create_all()
-        user_datastore.create_user(email='admin@kvoter.org.uk', password='admin')
+        user_datastore.create_user(email='admin@kvoter.org.uk',
+                                   password='admin')
         db.session.commit()
 
-    app.config["SECRET_KEY"] = "I AM THE DEVELOPMENT SECRET KEY! COMMIT ME TO PRODUCTION AT YOUR PERIL"
+    app.config["SECRET_KEY"] = ' '.join("I AM THE DEVELOPMENT SECRET KEY!",
+                                        "DO NOT COMMIT ME TO PRODUCTION")
     app.config["DEBUG"] = True
     app.run()
