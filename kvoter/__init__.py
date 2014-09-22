@@ -1,6 +1,13 @@
+from flask import render_template
 from app import app
 from db import db
 import users
+
+
+@app.route("/")
+def homepage():
+    return render_template("base.html")
+
 
 if __name__ == '__main__':
     db.create_all()
