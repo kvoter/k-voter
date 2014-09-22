@@ -5,7 +5,7 @@ import users
 if __name__ == '__main__':
     db.create_all()
 
-    users.get_or_create(name='admin',
+    users.get_or_create(user_name='admin',
                         password='admin',
                         email='admin@kvoter.local',
                         user_roles=['admin'])
