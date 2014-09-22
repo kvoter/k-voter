@@ -3,7 +3,7 @@ from flask.ext.security import (RoleMixin, Security, SQLAlchemyUserDatastore,
                                 UserMixin)
 from app import app
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:/"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///kvoter.db"
 
 db = SQLAlchemy(app)
 
@@ -22,6 +22,7 @@ class Role(db.Model, RoleMixin):
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), unique=True)
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean())
