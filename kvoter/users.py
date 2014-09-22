@@ -1,7 +1,11 @@
+from app import app
 from db import db, user_datastore, User
 import hashlib
 from sqlalchemy.orm.exc import NoResultFound
 import roles
+
+app.config['SECURITY_PASSWORD_HASH'] = 'bcrypt'
+app.config['SECURITY_FLASH_MESSAGES'] = True
 
 
 def create_user(user_name,
@@ -13,15 +17,6 @@ def create_user(user_name,
         roles.get_or_create(role)
         for role in user_roles
     ]
-
-    salt = hashlib.md5(bytes(user_name, 'utf8')).digest()
-
-    password = hashlib.pbkdf2_hmac(
-        hash_name='sha256',
-        password=bytes(password, 'utf8'),
-        salt=salt,
-        iterations=100000,
-    )
 
     user_datastore.create_user(
         name=user_name,
