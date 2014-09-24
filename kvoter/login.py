@@ -5,6 +5,8 @@ from flask.ext.login import LoginManager
 
 login_manager = LoginManager(app)
 
+login_manager.login_view = 'login'
+
 
 # TODO: Login view!
 
