@@ -62,7 +62,8 @@ class User(db.Model, UserMixin):
         self.active = True
         self.confirmed_at = None
         self.created_on = datetime.now()
-        self.confirmation_code = "".join(choice(ascii_letters + digits) for _ in range(32))
+        self.confirmation_code = "".join(choice(ascii_letters + digits)
+                                         for _ in range(32))
         for role in roles:
             role_obj = Role.get_or_create(role)
             self.roles.append(role_obj)
@@ -92,6 +93,3 @@ class User(db.Model, UserMixin):
 
     def validate_password(self, password):
         return self.password == self.hash_password(password)
-
-
-

@@ -12,4 +12,3 @@ def home_page():  # Why does this throw an exception?
 @login_required
 def admin_page():
     return render_template("admin.html")
-
