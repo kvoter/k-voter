@@ -1,24 +1,13 @@
 {% extends "base.html" %}
+{% from "_formhelpers.html" import render_field %}
 
 {% block content %}
     <form action="" method=post class="form-horizontal">
         <h2>Login</h2>
-        <div class="control-group">
-            <div class="controls">
-                <input type="text" id="username" name="username" class="input-xlarge" placeholder="Enter Username" required>
-            </div>
-        </div>
-
-        <div class="control-group">
-            <div class="controls">
-                <input type="password" id="password" name="password" class="input-xlarge" placeholder="Enter Password" required>
-            </div>
-        </div>
-
-        <div class="control-group">
-            <div class="controls">
-                <button type="submit" class="btn btn-success">Login</button>
-            </div>
-        </div>
+        <dl>
+            {{ render_field(form.username) }}
+            {{ render_field(form.password) }}
+        </dl>
+        <input type=submit value=Login>
     </form>
 {% endblock %}
