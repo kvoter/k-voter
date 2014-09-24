@@ -1,6 +1,6 @@
 from kvoter.db import User
 from kvoter.app import app
-from flask.ext.login import LoginManager, login_user
+from flask.ext.login import LoginManager, login_user, logout_user
 from flask import request, render_template, redirect, url_for
 from wtforms import Form, TextField, PasswordField, validators
 from sqlalchemy.orm.exc import NoResultFound
@@ -27,7 +27,7 @@ class LoginForm(Form):
     )
 
 
-def login():
+def login_view():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
         try:
@@ -46,6 +46,11 @@ def login():
             return 'Whoops'
     else:
         return render_template("login.html", form=form)
+
+
+def logout_view():
+    logout_user()
+    return redirect(url_for('home_page'))
 
 
 @login_manager.user_loader
