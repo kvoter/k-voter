@@ -51,6 +51,13 @@ def login_view():
 
 def logout_view():
     logout_user()
+    # TODO: We need to make sure that 'next' points to something on our
+    # site to avoid malicious redirects
+    return redirect(request.args.get('next') or url_for('home_page'))
+
+
+def register_view():
+    # TODO: Make this not be a stub
     return redirect(url_for('home_page'))
 
 

@@ -1,7 +1,7 @@
 from flask import render_template
 from flask.ext.login import login_required
 from kvoter import app
-from kvoter.auth import login_view, logout_view
+from kvoter.auth import login_view, logout_view, register_view
 
 
 @app.route("/")
@@ -15,5 +15,20 @@ def admin_page():
     return render_template("admin.html")
 
 
-app.add_url_rule('/login', 'login', login_view, methods=['GET', 'POST'])
-app.add_url_rule('/logout', 'logout', logout_view)
+app.add_url_rule(
+    '/login',
+    'login',
+    login_view,
+    methods=['GET', 'POST'],
+)
+app.add_url_rule(
+    '/logout',
+    'logout',
+    logout_view,
+)
+app.add_url_rule(
+    '/register',
+    'register',
+    register_view,
+    methods=['GET', 'POST'],
+)

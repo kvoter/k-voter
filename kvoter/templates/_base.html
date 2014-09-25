@@ -19,6 +19,20 @@
               <a href="/" class="brand">K-Voter</a> <small>Crowdsourcing democracy- welcome to meta-democracy</small>
           </h2>
         </div>
+        <div class="nav nav-pills pull-right">
+        
+        {% if current_user and current_user.name %}
+          <p class="navbar-text">Hello, {{ current_user.name }}!</p>
+          <a type="button" class="btn btn-default navbar-btn" href="{{ url_for('logout') }}?next={{ request.path }}">Logout</a>
+        {% else %}
+<!-- Logout on logged in, login on not logged in -->
+<!-- Register on login page -->
+<!-- Forgot username/password on login page -->
+<!-- Allow email login on login page -->
+          <p class="navbar-text">Hi, you can <a href="{{ url_for('register') }}">register</a> or </p>
+          <a type="button" class="btn btn-default navbar-btn" href="{{ url_for('login') }}">Login</a>
+        {% endif %}"
+        </div>
       </div>
     </div>
     {%- endblock -%}
