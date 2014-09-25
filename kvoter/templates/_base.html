@@ -3,11 +3,14 @@
   <head>
     <meta charset="utf-8">
     <title>K-Voter- Meta-voting</title>
-    <link href="{{ url_for('static', filename='css/bootstrap-3.2.0/css/bootstrap.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='bootstrap-3.2.0/css/bootstrap.css') }}" rel="stylesheet">
     <style>.content {padding-top: 80px;}</style>
   </head>
 
   <body>
+    <script src="{{ url_for('static', filename='jquery-2.1.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap-3.2.0/js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='bootstrap-growl.min.js') }}"></script>
     {%- block topbar -%}
     <div class="navbar navbar-inverse">
       <div class="container-fluid">
@@ -22,11 +25,19 @@
 
     <div class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
+            <script>
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} alert-dismissable" role="alert">{{ message }}</div>
+                    $.growl({
+                        message: '{{ message }}'
+                    }, {
+                        type: '{{ category }}',
+                        mouse_over: 'pause',
+                        spacing: 10
+                    });
                 {% endfor %}
             {% endif %}
+            </script>
         {% endwith %}
       <div class="content">
         {% block page_header %}{% endblock %}
