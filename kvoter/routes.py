@@ -1,4 +1,4 @@
-from flask import render_template, request
+from flask import render_template
 from flask.ext.login import login_required
 from kvoter import app
 from kvoter.auth import login_view, logout_view
@@ -6,7 +6,6 @@ from kvoter.auth import login_view, logout_view
 
 @app.route("/")
 def home_page():  # Why does this throw an exception?
-    print(dir(request))
     return render_template("home.html")
 
 
