@@ -1,7 +1,7 @@
 from kvoter.db import User
 from kvoter.app import app
 from flask.ext.login import LoginManager, login_user, logout_user
-from flask import request, render_template, redirect, url_for
+from flask import request, render_template, redirect, url_for, flash
 from wtforms import Form, TextField, PasswordField, validators
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -38,12 +38,13 @@ def login_view():
         if user and user.validate_password(form.password.data):
             # The user exists and the password is valid
             login_user(user)
+            flash('Welcome back, %s!' % user.name, 'success')
             # TODO: We need to make sure that 'next' points to something on our
             # site to avoid malicious redirects
             return redirect(request.args.get('next') or url_for('home_page'))
         else:
-            # TODO: Return "Username or password was incorrect, forgot link
-            return 'Whoops'
+            flash('Login failed!', 'danger')
+            return redirect(url_for('login'))
     else:
         return render_template("login.html", form=form)
 
