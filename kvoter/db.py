@@ -89,7 +89,20 @@ class User(db.Model, UserMixin):
         self._password = self.hash_password(password)
 
     def is_active(self):
-        return self.active and self.confirmed_at <= datetime.now()
+        # TODO: Use self.confirmed_at <= datetime.now() again?
+        return self.active
 
     def validate_password(self, password):
         return self.password == self.hash_password(password)
+
+    @staticmethod
+    def create(name, email, password):
+        try:
+            User.query.filter(User.name == name).one()
+            return None
+        except NoResultFound:
+            user = User(name, email, password)
+            db.session.add(user)
+            db.session.commit()
+            print(user)
+            return user
