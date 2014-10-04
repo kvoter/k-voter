@@ -161,6 +161,16 @@ def my_account_view():
                 'danger',
             )
             return redirect(url_for('me'))
+        election.candidates.append(current_user)
+        flash(
+            'Good luck in the %s election in %s, %s!' % (
+                    form.election_type.data,
+                    form.location.data,
+                    current_user.name,
+            ),
+            'success',
+        )
+        return redirect(url_for('me'))
     try:
         user = User.query.filter(User.name == current_user.name).one()
     except NoResultFound:

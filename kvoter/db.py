@@ -17,17 +17,56 @@ roles_users = db.Table(
     db.Column('role_id', db.Integer(), db.ForeignKey('roles.id'))
 )
 
-voters = db.Table(
-    'voters_elections',
-    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
-    db.Column('election_id', db.Integer(), db.ForeignKey('elections.id')),
-)
 
-candidates = db.Table(
-    'candidates_elections',
-    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
-    db.Column('election_id', db.Integer(), db.ForeignKey('elections.id')),
-)
+class CandidatesElections(db.Model):
+    __tablename__ = 'candidates_elections',
+    __tableargs__ = (
+        db.UniqueConstraint('user_id', 'election_id'),
+    )
+
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    election_id = db.Column(db.Integer(), db.ForeignKey('elections.id'))
+
+
+class VotersElections(db.Model):
+    __tablename__ = 'voters_elections'
+    __tableargs__ = (
+        db.UniqueConstraint('user_id', 'election_id'),
+    )
+
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    election_id = db.Column(db.Integer(), db.ForeignKey('elections.id'))
+
+
+#class Vote(db.Model):
+#    __tablename__ = 'votes'
+#    __tableargs__ = (
+#        db.UniqueConstraint('voter_id', 'candidate_id'),
+#    )
+#
+#    id = db.Column(db.Integer(), primary_key=True)
+#    voter_id = db.Column(db.Integer(), db.ForeignKey('voters_elections.id'))
+#    candidate_id = db.Column(db.Integer(), db.ForeignKey('candidates_elections.id'))
+#    election_id = db.Column(db.Integer(), db.ForeignKey('elections.id'))
+#
+#    def __init__(self, voter_id, candidate_id):
+#        self.voter_id = voter_id
+#        self.candidate_id = candidate_id
+#
+#    @staticmethod
+#    def create(voter_id, candidate_id):
+#        # TODO: Validate that both candidate and voter are in same election
+#        try:
+#            Vote.query.filter(Vote.voter_id == voter_id,
+#                              Vote.candidate_id == candidate_id).one()
+#            return None
+#        except NoResultFound:
+#            vote = Vote(voter_id, candidate_id)
+#            db.session.add(vote)
+#            db.session.commit()
+#            return vote
 
 
 class Election(db.Model):
@@ -38,9 +77,10 @@ class Election(db.Model):
     location = db.Column(db.String(80))
     potential_voters = db.Column(db.Integer())
     date_of_vote = db.Column(db.DateTime())
-    candidates = db.relationship('User', secondary=candidates,
-                                 backref=db.backref('elections',
-                                                    lazy='dynamic'))
+    candidates = db.relationship('CandidatesElections',
+                                 backref='election')
+    voters = db.relationship('VotersElections',
+                             backref='election')
 
     def __init__(self, election_type, location, potential_voters,
                  date_of_vote):

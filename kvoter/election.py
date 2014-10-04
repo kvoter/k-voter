@@ -59,6 +59,6 @@ def create_election_view():
                 ),
                 'success',
             )
-            return redirect(url_for('home_page'))
+            return redirect(url_for('home'))
     else:
         return render_template("election.html", form=form)
