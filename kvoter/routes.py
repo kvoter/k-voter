@@ -1,7 +1,8 @@
 from flask import render_template
 from flask.ext.login import login_required
 from kvoter import app
-from kvoter.auth import login_view, logout_view, register_view
+from kvoter.auth import (login_view, logout_view, register_view,
+                         my_account_view)
 from kvoter.election import create_election_view
 
 
@@ -37,5 +38,11 @@ app.add_url_rule(
     '/create_election',
     'create_election',
     create_election_view,
+    methods=['GET', 'POST'],
+)
+app.add_url_rule(
+    '/me',
+    'me',
+    my_account_view,
     methods=['GET', 'POST'],
 )

@@ -17,6 +17,18 @@ roles_users = db.Table(
     db.Column('role_id', db.Integer(), db.ForeignKey('roles.id'))
 )
 
+voters = db.Table(
+    'voters_elections',
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+    db.Column('election_id', db.Integer(), db.ForeignKey('elections.id')),
+)
+
+candidates = db.Table(
+    'candidates_elections',
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+    db.Column('election_id', db.Integer(), db.ForeignKey('elections.id')),
+)
+
 
 class Election(db.Model):
     __tablename__ = "elections"

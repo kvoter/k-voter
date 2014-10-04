@@ -1,0 +1,28 @@
+{% extends "_base.html" %}
+
+{% block content %}
+    <h2>User details</h2>
+    <dl>
+        <li>Name: {{ user.name }}</li>
+        <li>E-mail: {{ user.email }}</li> <!-- Change button -->
+    </dl>
+    <h2>Candidate</h2>
+    <dl>
+        {% for election in elections %}
+            <form action="" method="post" class="form-horizontal">
+            <input type="hidden" id="election_type" name="election_type" value="{{ election.election_type }}" />
+            <input type="hidden" id="location" name="location" value="{{ election.location }}" />
+            <li>{{ election.election_type }} in {{ election.location }} <input type="submit" class="btn btn-success" value="Become a candidate"></li>
+        <!-- Show where you are a candidate -->
+            </form>
+        {% endfor %}
+    </dl>
+    <h2>Voter</h2>
+    <dl>
+        Not yet!
+    </dl>
+        <!-- Become candidate button beside each election? Would need changing later to register interest in locations -->
+        <!-- Show where you are a voter -->
+        <!-- Become voter button (same as candidate stuff) -->
+    </h2>
+{% endblock %}

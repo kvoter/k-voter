@@ -1,6 +1,7 @@
-from kvoter.db import User
+from kvoter.db import User, Election
 from kvoter.app import app
-from flask.ext.login import LoginManager, login_user, logout_user
+from flask.ext.login import (LoginManager, login_user, logout_user,
+                             login_required, current_user)
 from flask import request, render_template, redirect, url_for, flash
 from wtforms import Form, TextField, PasswordField, validators
 from sqlalchemy.orm.exc import NoResultFound
@@ -55,6 +56,23 @@ class RegisterForm(Form):
         ],
     )
     email_confirm = TextField('Confirm E-mail')
+
+
+class RegisterCandidateOrVoterForm(Form):
+    election_type = TextField(
+        'Election type',
+        [
+            validators.Length(max=80),
+            validators.Required(),
+        ],
+    )
+    location = TextField(
+        'Election location',
+        [
+            validators.Length(max=80),
+            validators.Required(),
+        ],
+    )
 
 
 def login_view():
@@ -124,3 +142,32 @@ def register_view():
 @login_manager.user_loader
 def user_loader(id):
     return User.query.get(id)
+
+
+@login_required
+def my_account_view():
+    form = RegisterCandidateOrVoterForm(request.form)
+    if request.method == 'POST' and form.validate():
+        try:
+            election = Election.query.filter(
+                Election.election_type==form.election_type.data,
+                Election.location==form.location.data).one()
+        except NoResultFound:
+            flash(
+                'There is no %s election in %s' % (
+                    form.election_type.data,
+                    form.location.data,
+                ),
+                'danger',
+            )
+            return redirect(url_for('me'))
+    try:
+        user = User.query.filter(User.name == current_user.name).one()
+    except NoResultFound:
+        # The user does not exist
+        user = None
+        return  # TODO
+    
+    elections = Election.query.all()
+	
+    return render_template("me.html", user=user, elections=elections) 
