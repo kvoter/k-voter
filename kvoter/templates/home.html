@@ -1,5 +1,15 @@
 {% extends "_base.html" %}
 
 {% block content %}
-    <h3>COMING SOON</h3>
+        {% for election in elections %}
+            <h2>{{ election["type"] }} in {{ election["location"] }} <!-- progress bar --></h2>
+            <h3>Candidates</h3>
+            <dl>
+                {% for candidate in election["candidates"] %}
+                    <li> 
+                        {{ candidate.name }}
+                    </li>
+                {% endfor %}
+            </dl>
+        {% endfor %}
 {% endblock %}

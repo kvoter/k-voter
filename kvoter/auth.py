@@ -150,8 +150,8 @@ def my_account_view():
     if request.method == 'POST' and form.validate():
         try:
             election = Election.query.filter(
-                Election.election_type==form.election_type.data,
-                Election.location==form.location.data).one()
+                Election.election_type == form.election_type.data,
+                Election.location == form.location.data).one()
         except NoResultFound:
             flash(
                 'There is no %s election in %s' % (
@@ -167,7 +167,7 @@ def my_account_view():
         # The user does not exist
         user = None
         return  # TODO
-    
+
     elections = Election.query.all()
-	
-    return render_template("me.html", user=user, elections=elections) 
+
+    return render_template("me.html", user=user, elections=elections)

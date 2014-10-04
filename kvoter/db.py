@@ -38,6 +38,9 @@ class Election(db.Model):
     location = db.Column(db.String(80))
     potential_voters = db.Column(db.Integer())
     date_of_vote = db.Column(db.DateTime())
+    candidates = db.relationship('User', secondary=candidates,
+                                 backref=db.backref('elections',
+                                                    lazy='dynamic'))
 
     def __init__(self, election_type, location, potential_voters,
                  date_of_vote):

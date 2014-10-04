@@ -1,22 +1,15 @@
-from flask import render_template
-from flask.ext.login import login_required
 from kvoter import app
 from kvoter.auth import (login_view, logout_view, register_view,
                          my_account_view)
 from kvoter.election import create_election_view
+from kvoter.home import home_view
 
-
-@app.route("/")
-def home_page():  # Why does this throw an exception?
-    return render_template("home.html")
-
-
-@app.route("/admin")
-@login_required
-def admin_page():
-    return render_template("admin.html")
-
-
+app.add_url_rule(
+    '/',
+    'home',
+    home_view,
+    methods=['GET', 'POST'],
+)
 app.add_url_rule(
     '/login',
     'login',
