@@ -1,0 +1,15 @@
+{% extends "_base.html" %}
+{% from "_formhelpers.html" import render_field %}
+
+{% block content %}
+    <form action="" method=post class="form-horizontal">
+        <h2>Register</h2>
+        <dl>
+            {{ render_field(form.election_type) }}
+            {{ render_field(form.location) }}
+            {{ render_field(form.potential_voters) }}
+            {{ render_field(form.date_of_vote) }}
+        </dl>
+        <input type="submit" class="btn btn-success" value="Submit">
+    </form>
+{% endblock %}

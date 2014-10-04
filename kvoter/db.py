@@ -18,6 +18,36 @@ roles_users = db.Table(
 )
 
 
+class Election(db.Model):
+    __tablename__ = "elections"
+
+    id = db.Column(db.Integer(), primary_key=True)
+    election_type = db.Column(db.String(80))
+    location = db.Column(db.String(80))
+    potential_voters = db.Column(db.Integer())
+    date_of_vote = db.Column(db.DateTime())
+
+    def __init__(self, election_type, location, potential_voters,
+                 date_of_vote):
+        self.election_type = election_type
+        self.location = location
+        self.potential_voters = potential_voters
+        self.date_of_vote = date_of_vote
+
+    @staticmethod
+    def create(election_type, location, potential_voters, date_of_vote):
+        try:
+            Election.query.filter(Election.election_type == election_type,
+                                  Election.location == location).one()
+            return None
+        except NoResultFound:
+            election = Election(election_type, location, potential_voters,
+                                date_of_vote)
+            db.session.add(election)
+            db.session.commit()
+            return election
+
+
 class Role(db.Model):
     __tablename__ = "roles"
 
