@@ -18,26 +18,41 @@ roles_users = db.Table(
 )
 
 
-class CandidatesElections(db.Model):
-    __tablename__ = 'candidates_elections',
-    __tableargs__ = (
-        db.UniqueConstraint('user_id', 'election_id'),
-    )
+class Candidate(db.Model):
+    __tablename__ = 'candidates'
 
     id = db.Column(db.Integer(), primary_key=True)
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
     election_id = db.Column(db.Integer(), db.ForeignKey('elections.id'))
 
+    def __init__(self, user_id, election_id):
+        self.user_id = user_id
+        self.election_id = election_id
 
-class VotersElections(db.Model):
-    __tablename__ = 'voters_elections'
-    __tableargs__ = (
-        db.UniqueConstraint('user_id', 'election_id'),
-    )
+    @staticmethod
+    def create(user_id, election_id):
+        try:
+            Candidate.query.filter(
+                Candidate.user_id == user_id,
+                Candidate.election_id == election_id
+            ).one()
+            return None
+        except NoResultFound:
+            candidate = Candidate(user_id, election_id)
+            db.session.add(candidate)
+            db.session.commit()
+            return candidate
 
-    id = db.Column(db.Integer(), primary_key=True)
-    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
-    election_id = db.Column(db.Integer(), db.ForeignKey('elections.id'))
+
+#class VotersElections(db.Model):
+#    __tablename__ = 'voters_elections'
+#    __tableargs__ = (
+#        db.UniqueConstraint('user_id', 'election_id'),
+#    )
+#
+#    id = db.Column(db.Integer(), primary_key=True)
+#    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+#    election_id = db.Column(db.Integer(), db.ForeignKey('elections.id'))
 
 
 #class Vote(db.Model):
@@ -77,10 +92,10 @@ class Election(db.Model):
     location = db.Column(db.String(80))
     potential_voters = db.Column(db.Integer())
     date_of_vote = db.Column(db.DateTime())
-    candidates = db.relationship('CandidatesElections',
+    candidates = db.relationship('Candidate',
                                  backref='election')
-    voters = db.relationship('VotersElections',
-                             backref='election')
+    #voters = db.relationship('VotersElections',
+    #                         backref='election')
 
     def __init__(self, election_type, location, potential_voters,
                  date_of_vote):
@@ -189,5 +204,4 @@ class User(db.Model, UserMixin):
             user = User(name, email, password)
             db.session.add(user)
             db.session.commit()
-            print(user)
             return user

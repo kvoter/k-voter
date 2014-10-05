@@ -1,5 +1,4 @@
 {% extends "_base.html" %}
-
 {% block content %}
     <h2>User details</h2>
     <dl>
@@ -10,8 +9,7 @@
     <dl>
         {% for election in elections %}
             <form action="" method="post" class="form-horizontal">
-            <input type="hidden" id="election_type" name="election_type" value="{{ election.election_type }}" />
-            <input type="hidden" id="location" name="location" value="{{ election.location }}" />
+            <input type="hidden" id="election_id" name="election_id" value="{{ election.id }}" />
             <li>{{ election.election_type }} in {{ election.location }} <input type="submit" class="btn btn-success" value="Become a candidate"></li>
         <!-- Show where you are a candidate -->
             </form>
