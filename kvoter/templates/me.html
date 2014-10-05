@@ -10,6 +10,7 @@
         {% for election in elections %}
             <form action="" method="post" class="form-horizontal">
             <input type="hidden" id="election_id" name="election_id" value="{{ election.id }}" />
+            <input type="hidden" id="mode" name="mode" value="candidate" />
             <li>{{ election.election_type }} in {{ election.location }} <input type="submit" class="btn btn-success" value="Become a candidate"></li>
         <!-- Show where you are a candidate -->
             </form>
@@ -17,7 +18,14 @@
     </dl>
     <h2>Voter</h2>
     <dl>
-        Not yet!
+        {% for election in elections %}
+            <form action="" method="post" class="form-horizontal">
+            <input type="hidden" id="election_id" name="election_id" value="{{ election.id }}" />
+            <input type="hidden" id="mode" name="mode" value="voter" />
+            <li>{{ election.election_type }} in {{ election.location }} <input type="submit" class="btn btn-success" value="Become a voter"></li>
+        <!-- Show where you are a voter -->
+            </form>
+        {% endfor %}
     </dl>
         <!-- Become candidate button beside each election? Would need changing later to register interest in locations -->
         <!-- Show where you are a voter -->

@@ -1,4 +1,4 @@
-from kvoter.db import User, Election, Candidate
+from kvoter.db import User, Election, Candidate, Voter
 from kvoter.app import app
 from flask.ext.login import (LoginManager, login_user, logout_user,
                              login_required, current_user)
@@ -8,7 +8,6 @@ from sqlalchemy.orm.exc import NoResultFound
 
 
 login_manager = LoginManager(app)
-
 login_manager.login_view = 'login'
 
 
@@ -62,6 +61,16 @@ class RegisterCandidateOrVoterForm(Form):
     election_id = IntegerField(
         'Election ID',
         [
+            validators.Required(),
+        ],
+    )
+    mode = TextField(
+        'Mode',
+        [
+            validators.AnyOf([
+                'voter',
+                'candidate',
+            ]),
             validators.Required(),
         ],
     )
@@ -142,28 +151,53 @@ def my_account_view():
     elections = Election.query.all()
 
     if request.method == 'POST' and form.validate():
-        candidate = Candidate.create(current_user.id,
-                                     form.election_id.data)
-        if candidate is None:
-            flash(
-                'Could not stand in that election.'
-                'You may already be standing.',
-                'danger'
-            )
-            return redirect(url_for('me'))
-        else:
-            election = [election
-                        for election in elections
-                        if election.id == form.election_id.data][0]
-            flash(
-                'Good luck in the %s election in %s, %s!' % (
-                        election.election_type,
-                        election.location,
-                        current_user.name,
-                ),
-                'success',
-            )
-            return redirect(url_for('me'))
+        if form.mode.data == 'voter':
+            voter = Voter.create(current_user.id,
+                                 form.election_id.data)
+            if voter is None:
+                flash(
+                    ('Could not vote in that election.'
+                     'You may already be voter.'),
+                    'danger'
+                )
+                return redirect(url_for('me'))
+            else:
+                election = [election
+                            for election in elections
+                            if election.id == form.election_id.data][0]
+                flash(
+                    ('We hope your favourite candidate wins in the %s '
+                     'election in %s, %s!') % (
+                            election.election_type,
+                            election.location,
+                            current_user.name,
+                    ),
+                    'success',
+                )
+                return redirect(url_for('me'))
+        elif form.mode.data == 'candidate':
+            candidate = Candidate.create(current_user.id,
+                                         form.election_id.data)
+            if candidate is None:
+                flash(
+                    ('Could not stand in that election.'
+                     'You may already be standing.'),
+                    'danger'
+                )
+                return redirect(url_for('me'))
+            else:
+                election = [election
+                            for election in elections
+                            if election.id == form.election_id.data][0]
+                flash(
+                    'Good luck in the %s election in %s, %s!' % (
+                            election.election_type,
+                            election.location,
+                            current_user.name,
+                    ),
+                    'success',
+                )
+                return redirect(url_for('me'))
     try:
         user = User.query.filter(User.name == current_user.name).one()
     except NoResultFound:

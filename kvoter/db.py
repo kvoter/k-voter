@@ -44,44 +44,30 @@ class Candidate(db.Model):
             return candidate
 
 
-#class VotersElections(db.Model):
-#    __tablename__ = 'voters_elections'
-#    __tableargs__ = (
-#        db.UniqueConstraint('user_id', 'election_id'),
-#    )
-#
-#    id = db.Column(db.Integer(), primary_key=True)
-#    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
-#    election_id = db.Column(db.Integer(), db.ForeignKey('elections.id'))
+class Voter(db.Model):
+    __tablename__ = 'voters'
 
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    election_id = db.Column(db.Integer(), db.ForeignKey('elections.id'))
 
-#class Vote(db.Model):
-#    __tablename__ = 'votes'
-#    __tableargs__ = (
-#        db.UniqueConstraint('voter_id', 'candidate_id'),
-#    )
-#
-#    id = db.Column(db.Integer(), primary_key=True)
-#    voter_id = db.Column(db.Integer(), db.ForeignKey('voters_elections.id'))
-#    candidate_id = db.Column(db.Integer(), db.ForeignKey('candidates_elections.id'))
-#    election_id = db.Column(db.Integer(), db.ForeignKey('elections.id'))
-#
-#    def __init__(self, voter_id, candidate_id):
-#        self.voter_id = voter_id
-#        self.candidate_id = candidate_id
-#
-#    @staticmethod
-#    def create(voter_id, candidate_id):
-#        # TODO: Validate that both candidate and voter are in same election
-#        try:
-#            Vote.query.filter(Vote.voter_id == voter_id,
-#                              Vote.candidate_id == candidate_id).one()
-#            return None
-#        except NoResultFound:
-#            vote = Vote(voter_id, candidate_id)
-#            db.session.add(vote)
-#            db.session.commit()
-#            return vote
+    def __init__(self, user_id, election_id):
+        self.user_id = user_id
+        self.election_id = election_id
+
+    @staticmethod
+    def create(user_id, election_id):
+        try:
+            Voter.query.filter(
+                Voter.user_id == user_id,
+                Voter.election_id == election_id
+            ).one()
+            return None
+        except NoResultFound:
+            voter = Voter(user_id, election_id)
+            db.session.add(voter)
+            db.session.commit()
+            return voter
 
 
 class Election(db.Model):
