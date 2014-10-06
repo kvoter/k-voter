@@ -18,6 +18,92 @@ roles_users = db.Table(
 )
 
 
+class Candidate(db.Model):
+    __tablename__ = 'candidates'
+
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    election_id = db.Column(db.Integer(), db.ForeignKey('elections.id'))
+
+    def __init__(self, user_id, election_id):
+        self.user_id = user_id
+        self.election_id = election_id
+
+    @staticmethod
+    def create(user_id, election_id):
+        try:
+            Candidate.query.filter(
+                Candidate.user_id == user_id,
+                Candidate.election_id == election_id
+            ).one()
+            return None
+        except NoResultFound:
+            candidate = Candidate(user_id, election_id)
+            db.session.add(candidate)
+            db.session.commit()
+            return candidate
+
+
+class Voter(db.Model):
+    __tablename__ = 'voters'
+
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id'))
+    election_id = db.Column(db.Integer(), db.ForeignKey('elections.id'))
+
+    def __init__(self, user_id, election_id):
+        self.user_id = user_id
+        self.election_id = election_id
+
+    @staticmethod
+    def create(user_id, election_id):
+        try:
+            Voter.query.filter(
+                Voter.user_id == user_id,
+                Voter.election_id == election_id
+            ).one()
+            return None
+        except NoResultFound:
+            voter = Voter(user_id, election_id)
+            db.session.add(voter)
+            db.session.commit()
+            return voter
+
+
+class Election(db.Model):
+    __tablename__ = "elections"
+
+    id = db.Column(db.Integer(), primary_key=True)
+    election_type = db.Column(db.String(80))
+    location = db.Column(db.String(80))
+    potential_voters = db.Column(db.Integer())
+    date_of_vote = db.Column(db.DateTime())
+    candidates = db.relationship('Candidate',
+                                 backref='election')
+    #voters = db.relationship('VotersElections',
+    #                         backref='election')
+
+    def __init__(self, election_type, location, potential_voters,
+                 date_of_vote):
+        self.election_type = election_type
+        self.location = location
+        self.potential_voters = potential_voters
+        self.date_of_vote = date_of_vote
+
+    @staticmethod
+    def create(election_type, location, potential_voters, date_of_vote):
+        try:
+            Election.query.filter(Election.election_type == election_type,
+                                  Election.location == location).one()
+            return None
+        except NoResultFound:
+            election = Election(election_type, location, potential_voters,
+                                date_of_vote)
+            db.session.add(election)
+            db.session.commit()
+            return election
+
+
 class Role(db.Model):
     __tablename__ = "roles"
 
@@ -104,5 +190,4 @@ class User(db.Model, UserMixin):
             user = User(name, email, password)
             db.session.add(user)
             db.session.commit()
-            print(user)
             return user
