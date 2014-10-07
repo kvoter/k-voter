@@ -2,9 +2,12 @@ from kvoter.db import User, Election, Candidate, Voter
 from kvoter.app import app
 from flask.ext.login import (LoginManager, login_user, logout_user,
                              login_required, current_user)
-from flask import request, render_template, redirect, url_for, flash
+from flask import request, render_template, redirect, url_for, flash, abort
 from wtforms import Form, TextField, PasswordField, validators, IntegerField
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy import or_
+import hmac
+from hashlib import sha256
 
 
 login_manager = LoginManager(app)
@@ -76,11 +79,20 @@ class RegisterCandidateOrVoterForm(Form):
     )
 
 
+def secure_redirect(next, digest, fallback):
+    try:
+        if hmac.compare_digest(hmac.new(app.config["SECRET_KEY"], next, sha256()), digest):
+            return next
+    except:
+        pass
+    return fallback
+
+
 def login_view():
     form = LoginForm(request.form)
     if request.method == 'POST' and form.validate():
         try:
-            user = User.query.filter(User.name == form.username.data).one()
+            user = User.query.filter(or_(User.name == form.username.data, User.email == form.username.data)).one()
         except NoResultFound:
             # The user does not exist
             user = None
@@ -90,7 +102,7 @@ def login_view():
             flash('Welcome back, %s!' % user.name, 'success')
             # TODO: We need to make sure that 'next' points to something on our
             # site to avoid malicious redirects
-            return redirect(request.args.get('next') or url_for('home'))
+            return redirect(secure_redirect(request.args.get('next'), request.args.get('hmac'), url_for('home')))
         else:
             flash('Login failed!', 'danger')
             return redirect(url_for('login'))
@@ -98,11 +110,54 @@ def login_view():
         return render_template("login.html", form=form)
 
 
+@login_manager.unauthorized_callback
+def unauthorized():
+    if request.blueprint in login_manager.blueprint_login_views:
+        login_view = login_manager.blueprint_login_views[request.blueprint]
+    else:
+        login_view = login_manager.login_view
+
+    if not login_view:
+        abort(401)
+
+    if login_manager.login_message:
+        if login_manager.localize_callback is not None:
+            flash(login_manager.localize_callback(login_manager.login_message),
+                  category=login_manager.login_message_category)
+        else:
+            flash(login_manager.login_message, category=login_manager.login_message_category)
+
+    return redirect(url_for(
+        login_view,
+        next=request.url,
+        hmac=hmac.new(app.config["SECRET_KEY"], request.url, sha256()).hexdigest())
+    )
+
+
+@login_manager.needs_refresh_callback
+def needs_refresh():
+    if not login_manager.refresh_view:
+        abort(403)
+
+    if login_manager.localize_callback is not None:
+        flash(login_manager.localize_callback(login_manager.needs_refresh_message),
+              category=login_manager.needs_refresh_message_category)
+    else:
+        flash(login_manager.needs_refresh_message,
+              category=login_manager.needs_refresh_message_category)
+
+    return redirect(url_for(
+        login_view,
+        next=request.url,
+        hmac=hmac.new(app.config["SECRET_KEY"], request.url, sha256()).hexdigest())
+    )
+
+
 def logout_view():
     logout_user()
     # TODO: We need to make sure that 'next' points to something on our
     # site to avoid malicious redirects
-    return redirect(request.args.get('next') or url_for('home'))
+    return redirect(secure_redirect(request.args.get('next'), request.args.get('hmac'), url_for('home')))
 
 
 def register_view():
