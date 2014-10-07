@@ -7,7 +7,6 @@ from wtforms import Form, TextField, PasswordField, validators, IntegerField
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy import or_
 import hmac
-from hashlib import sha256
 
 
 login_manager = LoginManager(app)
@@ -81,11 +80,15 @@ class RegisterCandidateOrVoterForm(Form):
 
 def secure_redirect(next, digest, fallback):
     try:
-        if hmac.compare_digest(hmac.new(app.config["SECRET_KEY"], next, sha256()), digest):
+        if hmac.compare_digest(generate_hmac(next), digest):
             return next
     except:
         pass
     return fallback
+
+
+def generate_hmac(message):
+    return hmac.new(bytes(app.config["SECRET_KEY"], "utf8"), bytes(message, "utf8"), "sha256").hexdigest()
 
 
 def login_view():
@@ -110,13 +113,8 @@ def login_view():
         return render_template("login.html", form=form)
 
 
-@login_manager.unauthorized_callback
+@login_manager.unauthorized_handler
 def unauthorized():
-    if request.blueprint in login_manager.blueprint_login_views:
-        login_view = login_manager.blueprint_login_views[request.blueprint]
-    else:
-        login_view = login_manager.login_view
-
     if not login_view:
         abort(401)
 
@@ -128,13 +126,13 @@ def unauthorized():
             flash(login_manager.login_message, category=login_manager.login_message_category)
 
     return redirect(url_for(
-        login_view,
+        "login",
         next=request.url,
-        hmac=hmac.new(app.config["SECRET_KEY"], request.url, sha256()).hexdigest())
-    )
+        hmac=generate_hmac(request.url)
+    ))
 
 
-@login_manager.needs_refresh_callback
+@login_manager.needs_refresh_handler
 def needs_refresh():
     if not login_manager.refresh_view:
         abort(403)
@@ -147,10 +145,10 @@ def needs_refresh():
               category=login_manager.needs_refresh_message_category)
 
     return redirect(url_for(
-        login_view,
+        "login",
         next=request.url,
-        hmac=hmac.new(app.config["SECRET_KEY"], request.url, sha256()).hexdigest())
-    )
+        hmac=generate_hmac(request.url)
+    ))
 
 
 def logout_view():
