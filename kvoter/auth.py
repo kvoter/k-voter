@@ -126,7 +126,7 @@ def unauthorized():
             flash(login_manager.login_message, category=login_manager.login_message_category)
 
     return redirect(url_for(
-        "login",
+        login_manager.login_view,
         next=request.url,
         hmac=generate_hmac(request.url)
     ))
@@ -145,7 +145,7 @@ def needs_refresh():
               category=login_manager.needs_refresh_message_category)
 
     return redirect(url_for(
-        "login",
+        login_manager.login_view,
         next=request.url,
         hmac=generate_hmac(request.url)
     ))
