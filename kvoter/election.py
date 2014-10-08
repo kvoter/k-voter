@@ -1,3 +1,4 @@
+from flask.ext.login import login_required
 from kvoter.db import Election
 from flask import request, render_template, redirect, url_for, flash
 from wtforms import Form, TextField, IntegerField, DateField, validators
@@ -32,6 +33,7 @@ class ElectionForm(Form):
     )
 
 
+@login_required
 def create_election_view():
     form = ElectionForm(request.form)
     if request.method == 'POST' and form.validate():
